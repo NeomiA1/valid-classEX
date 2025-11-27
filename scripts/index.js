@@ -13,23 +13,27 @@ document.addEventListener("DOMContentLoaded", () => {
   // ======================
   //     AUTH MODAL
   // ======================
-  const modal     = document.querySelector("#auth-modal");
-  const btnAuth   = document.querySelector("#btn-auth");
-  const btnClose  = document.querySelector("#auth-close");
-  const tabReg    = document.querySelector("#tab-register");
-  const tabLog    = document.querySelector("#tab-login");
-  const regForm   = document.querySelector("#register-form");
-  const logForm   = document.querySelector("#login-form");
-  const regMsg    = document.querySelector("#reg-msg");
-  const logMsg    = document.querySelector("#login-msg");
+  const modal = document.querySelector("#auth-modal");
+  const btnAuth = document.querySelector("#btn-auth");
+  const btnClose = document.querySelector("#auth-close");
+  const tabReg = document.querySelector("#tab-register");
+  const tabLog = document.querySelector("#tab-login");
+  const regForm = document.querySelector("#register-form");
+  const logForm = document.querySelector("#login-form");
+  const regMsg = document.querySelector("#reg-msg");
+  const logMsg = document.querySelector("#login-msg");
 
   function openModal() {
-    if (modal) modal.classList.remove("hidden");
+    if (!modal) return;
+    modal.classList.remove("hidden");
+    modal.style.display = "flex";
   }
 
   function closeModal() {
     if (!modal) return;
     modal.classList.add("hidden");
+    modal.style.display = "none";
+
     if (regMsg) regMsg.textContent = "";
     if (logMsg) logMsg.textContent = "";
   }
@@ -54,9 +58,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnAuth) {
     btnAuth.addEventListener("click", () => {
       if (isLoggedIn()) {
+        // Logout: מוחק משתמש ורענון העמוד
         logout();
         setAuthUI();
+        window.location.reload();
       } else {
+        // Login: רק פותח מודל, לא אוטומטי בטעינה
         showLogin();
         openModal();
       }
@@ -73,23 +80,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // טאבים
-  if (tabReg) tabReg.addEventListener("click", showRegister);
-  if (tabLog) tabLog.addEventListener("click", showLogin);
+  // מעבר טאבים
+  if (tabReg) {
+    tabReg.addEventListener("click", showRegister);
+  }
+  if (tabLog) {
+    tabLog.addEventListener("click", showLogin);
+  }
 
-  // ----- REGISTER -----
+  // -------- Register --------
   if (regForm) {
     regForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (regMsg) regMsg.textContent = "";
       if (logMsg) logMsg.textContent = "";
 
-      const userNameInput  = document.querySelector("#reg-username");
-      const emailInput     = document.querySelector("#reg-email");
-      const passwordInput  = document.querySelector("#reg-password");
+      const userNameInput = document.querySelector("#reg-username");
+      const emailInput = document.querySelector("#reg-email");
+      const passwordInput = document.querySelector("#reg-password");
 
       const userName = userNameInput.value.trim();
-      const email    = emailInput.value.trim();
+      const email = emailInput.value.trim();
       const password = passwordInput.value;
 
       if (!userName || !email || !password) {
@@ -100,30 +111,25 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         await registerUser(userName, email, password);
 
-        // נקה שדות
-        userNameInput.value = "";
-        emailInput.value    = "";
-        passwordInput.value = "";
+        // אפשר להשאיר פשוט – רק הודעה בטאב של Register
+        if (regMsg) regMsg.textContent = "Registered successfully. You can login now.";
 
-        // הודעה בלוגין + מעבר לטאב לוגין
-        if (logMsg) logMsg.textContent = "Registered! Now login with your details.";
-        showLogin();
       } catch (err) {
         if (regMsg) regMsg.textContent = err.message;
       }
     });
   }
 
-  // ----- LOGIN -----
+  // -------- Login --------
   if (logForm) {
     logForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (logMsg) logMsg.textContent = "";
 
-      const emailInput    = document.querySelector("#login-email");
+      const emailInput = document.querySelector("#login-email");
       const passwordInput = document.querySelector("#login-password");
 
-      const email    = emailInput.value.trim();
+      const email = emailInput.value.trim();
       const password = passwordInput.value;
 
       if (!email || !password) {
@@ -142,29 +148,38 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // חיווי ראשוני
+  // חיווי ראשוני לפי מצב החיבור (לא פותח מודל!)
   setAuthUI();
 
   // ======================
   //     MOVIES LOGIC
   // ======================
-  const containerSelector   = "#movies";
-  const container           = document.querySelector(containerSelector);
-  const wishBtn             = document.querySelector("#btn-show-wish");
-  const filterRatingBtn     = document.querySelector("#btn-filter-rating");
-  const filterDurationBtn   = document.querySelector("#btn-filter-duration");
-  const showAllBtn          = document.querySelector("#btn-show-all");
+  const containerSelector = "#movies";
+  const container = document.querySelector(containerSelector);
+
+  const wishBtn = document.querySelector("#btn-show-wish");
+  const filterRatingBtn = document.querySelector("#btn-filter-rating");
+  const filterDurationBtn = document.querySelector("#btn-filter-duration");
+  const showAllBtn = document.querySelector("#btn-show-all");
+  const addMovieBtn = document.querySelector("#btn-add-movie");
 
   if (wishBtn) {
     wishBtn.addEventListener("click", () => {
+      if (!isLoggedIn()) {
+        alert("Please login first.");
+        showLogin();
+        openModal();
+        return;
+      }
+  
       window.location.href = "wishList.html";
     });
-  }
+  }  
 
   if (filterRatingBtn) {
     filterRatingBtn.addEventListener("click", () => {
       const input = document.querySelector("#min-rating");
-      const raw   = input.value.trim();
+      const raw = input.value.trim();
       const value = Number(raw);
 
       if (!raw || isNaN(value)) {
@@ -187,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (filterDurationBtn) {
     filterDurationBtn.addEventListener("click", () => {
       const input = document.querySelector("#max-duration");
-      const raw   = input.value.trim();
+      const raw = input.value.trim();
       const value = Number(raw);
 
       if (!raw || isNaN(value)) {
@@ -207,40 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (showAllBtn) {
-    showAllBtn.addEventListener("click", () => {
-      loadAllMovies();
-    });
-  }
-
-  if (container) {
-    container.addEventListener("click", (event) => {
-      const btn = event.target.closest(".btn-add-wish");
-      if (!btn) return;
-
-      const id    = Number(btn.getAttribute("data-id"));
-      const movie = (window.__ALL_MOVIES__ || []).find(m => m.id === id);
-      if (!movie) return;
-
-      fetch(`${API_BASE}/Movie/wishlist`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(movie)
-      })
-        .then(res => {
-          if (res.ok) {
-            btn.disabled   = true;
-            btn.textContent = "Added ✓";
-          } else {
-            return res.text().then(msg => alert(msg || "Request failed"));
-          }
-        })
-        .catch(() => {
-          alert("Network error");
-        });
-    });
-  }
-
+  // Show all movies
   function loadAllMovies() {
     fetch(`${API_BASE}/Movie`)
       .then(res => res.json())
@@ -253,5 +235,55 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
+  if (showAllBtn) {
+    showAllBtn.addEventListener("click", () => {
+      loadAllMovies();
+    });
+  }
+
+  if (addMovieBtn) {
+    addMovieBtn.addEventListener("click", () => {
+      window.location.href = "addMovie.html";
+    });
+  }
+
+  // Add to Wish List
+  if (container) {
+    container.addEventListener("click", (event) => {
+      const btn = event.target.closest(".btn-add-wish");
+      if (!btn) return;
+
+      // אם לא מחובר – נפתח מודל, אבל רק בלחיצה על הכפתור, לא בטעינה
+      if (!isLoggedIn()) {
+        alert("Please login first.");
+        showLogin();
+        openModal();
+        return;
+      }
+
+      const id = Number(btn.getAttribute("data-id"));
+      const movie = (window.__ALL_MOVIES__ || []).find(m => m.id === id);
+      if (!movie) return;
+
+      fetch(`${API_BASE}/Movie/wishlist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(movie)
+      })
+        .then(res => {
+          if (res.ok) {
+            btn.disabled = true;
+            btn.textContent = "Added ✓";
+          } else {
+            return res.text().then(msg => alert(msg || "Request failed"));
+          }
+        })
+        .catch(() => {
+          alert("Network error");
+        });
+    });
+  }
+
+  // טעינה ראשונית של הסרטים
   loadAllMovies();
 });

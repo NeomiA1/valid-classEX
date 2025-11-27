@@ -41,20 +41,32 @@ export function isLoggedIn() {
 export function setAuthUI() {
   const btnAuth = document.querySelector("#btn-auth");
   const indicator = document.querySelector("#auth-indicator");
+  const btnAddMovie = document.querySelector("#btn-add-movie"); // חדש
+
   if (!btnAuth || !indicator) return;
 
   const user = getUser();
 
   if (user) {
     btnAuth.textContent = "Logout";
-    indicator.style.display = "inline";
     indicator.textContent = `Hi, ${user.userName || user.UserName}`;
+    indicator.classList.remove("hidden");
+
+    if (btnAddMovie) {
+      btnAddMovie.classList.remove("hidden");
+    }
+
   } else {
     btnAuth.textContent = "Login";
-    indicator.style.display = "none";
     indicator.textContent = "";
+    indicator.classList.add("hidden");
+
+    if (btnAddMovie) {
+      btnAddMovie.classList.add("hidden");
+    }
   }
 }
+
 
 export async function registerUser(userName, email, password) {
   const res = await fetch(`${API_BASE}/Users/register`, {

@@ -5,33 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Class-EX</title>
 
+  <!-- כל ה-CSS כאן כדי שלא תהיה בעיית נתיב -->
   <style>
     :root {
       --gap: 12px;
       --card-radius: 10px;
       --shadow: 0 4px 8px rgba(0,0,0,.08);
+    
+      --bg: #f4f4f4;
+      --surface: #ffffff;
+      --text: #222;
+      --muted: #555;
+    
+      --primary: #007bff;
+      --primary-hover: #0056b3;
+      --danger: #dc3545;
+      --danger-hover: #b02a37;
+      --border: #ddd;
     }
+    
+    /* בסיס */
+    * { box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+      background-color: var(--bg);
       margin: 0;
-      color: #222;
+      color: var(--text);
     }
     .page {
       max-width: 1100px;
       margin: 0 auto;
       padding: 24px;
     }
-
+    
+    /* Sections כלליים */
     .section {
-      background: #fff;
+      background: var(--surface);
       border-radius: var(--card-radius);
       box-shadow: var(--shadow);
       padding: 18px;
       margin-bottom: 20px;
     }
-    .section h2 { margin: 0 0 12px; font-size: 20px; }
-
+    .section h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+    
+    /* Controls למעלה */
     .controls {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -43,150 +63,263 @@
     .controls button {
       padding: 12px;
       border-radius: 8px;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border);
       font-size: 14px;
-      box-sizing: border-box;
     }
     .controls button {
-      background: #007bff;
+      background: var(--primary);
       color: #fff;
       border: none;
       cursor: pointer;
-      transition: background .2s ease;
+      transition: background .2s ease, transform .05s ease;
     }
-    .controls button:hover { background: #0056b3; }
-
+    .controls button:hover { background: var(--primary-hover); }
+    .controls button:active { transform: translateY(1px); }
+    
+    /* חיווי משתמש מחובר */
     #auth-indicator{
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: #e9f2ff;
+      color: var(--primary);
       font-size: 14px;
-      color: #007bff;
-      text-align: right;
+      text-align: center;
     }
-
+    
+    /* גרידים של סרטים/ווישליסט */
     #movies, #wish-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
       gap: var(--gap);
     }
+    
+    /* כרטיס סרט */
     .movie-card {
       border: 1px solid #eee;
       border-radius: var(--card-radius);
       padding: 12px;
-      background: #fff;
+      background: var(--surface);
       display: flex;
       flex-direction: column;
       gap: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.04);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .movie-card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,.08);
+    }
+    .movie-card img{
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #fafafa;
     }
     .movie-card h3 { margin: 0; font-size: 18px; }
-    .movie-card p  { margin: 0; color: #555; font-size: 14px; }
+    .movie-card p  { margin: 0; color: var(--muted); font-size: 14px; }
+    
     .btn-add-wish {
       margin-top: 8px;
       padding: 10px;
       border-radius: 8px;
-      border: 1px solid #007bff;
+      border: 1px solid var(--primary);
       background: #fff;
-      color: #007bff;
+      color: var(--primary);
       cursor: pointer;
       transition: all .2s ease;
     }
     .btn-add-wish:hover {
-      background: #007bff;
+      background: var(--primary);
       color: #fff;
     }
-
-    /* ===== Auth modal ===== */
-    .hidden { display: none; }
-
-    .auth-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-
-    .auth-box {
-      width: 100%;
-      max-width: 420px;
-      background: #fff;
-      border-radius: 10px;
-      padding: 18px;
-      position: relative;
-      box-shadow: 0 6px 16px rgba(0,0,0,.2);
-    }
-
-    .auth-close {
-      position: absolute;
-      top: 8px;
-      right: 10px;
+    
+    .btn-primary, .btn-secondary, .btn-danger, .btn-outline {
+      padding: 10px 12px;
+      border-radius: 8px;
       border: none;
-      background: transparent;
-      font-size: 22px;
       cursor: pointer;
-    }
-
-    .auth-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .auth-tabs button {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
-      background: #f7f7f7;
-      cursor: pointer;
-      border-radius: 6px;
-    }
-    .auth-tabs .active {
-      background: #007bff;
-      color: #fff;
-      border-color: #007bff;
-    }
-
-    .auth-form input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
-    .auth-form button {
-      width: 100%;
-      padding: 12px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .auth-form button:hover { background: #0056b3; }
-
-    .auth-msg {
-      margin: 8px 0 0;
       font-size: 14px;
+      transition: background .2s ease, color .2s ease, border .2s ease;
+    }
+    .btn-primary { background: var(--primary); color:#fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    
+    .btn-danger { background: var(--danger); color:#fff; }
+    .btn-danger:hover { background: var(--danger-hover); }
+    
+    .btn-outline{
+      background: #fff;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    .btn-outline:hover{ background: var(--primary); color:#fff; }
+    
+    .form-card {
+      background: var(--surface);
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .form-card h2, .form-card h1 {
+      margin: 0 0 12px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .form-grid label{
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .form-grid input,
+    .form-grid select,
+    .form-grid textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+    }
+    .form-grid textarea{ min-height: 90px; resize: vertical; }
+    
+    .form-actions{
+      display:flex;
+      gap:8px;
+      margin-top: 6px;
+    }
+    .form-actions button{ flex:1; }
+    
+    .field-error {
+      border-color: var(--danger) !important;
+      background: #fff5f5;
+    }
+    .error-msg {
+      color: var(--danger);
+      font-size: 13px;
+      margin-top: -6px;
+    }
+    .success-msg{
+      color: #198754;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    
+.hidden {
+  display: none !important;
+}
+
+.auth-modal.hidden {
+  display: none !important;
+}
+
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.auth-box {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px;
+  position: relative;
+  box-shadow: 0 6px 16px rgba(0,0,0,.2);
+}
+
+.auth-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.auth-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border);
+  background: #f7f7f7;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.auth-tabs .active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 15px;
+}
+.auth-form button {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.auth-form button:hover { background: var(--primary-hover); }
+
+.auth-msg {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+    
+    @media (max-width: 600px){
+      .page{ padding: 14px; }
+      #movies, #wish-list{
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+      .movie-card img{ height: 180px; }
     }
   </style>
 </head>
+
 <body>
   <main class="page">
 
     <section class="section">
       <h2>Movies Controls</h2>
+
       <div class="controls">
-        <input id="min-rating" type="number" step="0.1" placeholder="Min rating"/>
+        <input id="min-rating" type="number" step="0.1" placeholder="Min rating">
         <button id="btn-filter-rating">Filter by Rating</button>
 
-        <input id="max-duration" type="number" placeholder="Max duration (min)"/>
+        <input id="max-duration" type="number" placeholder="Max duration (min)">
         <button id="btn-filter-duration">Filter by Duration</button>
 
         <button id="btn-show-all">Show All</button>
         <button id="btn-show-wish">Show Wish List</button>
 
         <button id="btn-auth">Login</button>
-        <span id="auth-indicator"></span>
+
+        <button id="btn-add-movie" class="hidden">Add Movie</button>
+
+        <span id="auth-indicator" class="hidden"></span>
       </div>
     </section>
 
@@ -197,29 +330,28 @@
 
   </main>
 
-  <!-- Auth Modal -->
   <div id="auth-modal" class="auth-modal hidden">
     <div class="auth-box">
-      <button id="auth-close" class="auth-close">&times;</button>
+      <button id="auth-close" class="auth-close">✖</button>
 
       <div class="auth-tabs">
-        <button id="tab-register" class="active">Register</button>
-        <button id="tab-login">Login</button>
+        <button id="tab-login" class="active">Login</button>
+        <button id="tab-register">Register</button>
       </div>
 
-      <form id="register-form" class="auth-form">
-        <input id="reg-username" type="text" placeholder="User name" required />
-        <input id="reg-email" type="email" placeholder="Email" required />
-        <input id="reg-password" type="password" placeholder="Password" required minlength="6" />
-        <button type="submit">Register</button>
-        <p id="reg-msg" class="auth-msg"></p>
-      </form>
-
-      <form id="login-form" class="auth-form hidden">
-        <input id="login-email" type="email" placeholder="Email" required />
-        <input id="login-password" type="password" placeholder="Password" required />
+      <form id="login-form" class="auth-form">
+        <input id="login-email" type="email" placeholder="Email" required>
+        <input id="login-password" type="password" placeholder="Password" required>
         <button type="submit">Login</button>
         <p id="login-msg" class="auth-msg"></p>
+      </form>
+
+      <form id="register-form" class="auth-form hidden">
+        <input id="reg-username" type="text" placeholder="User Name" required>
+        <input id="reg-email" type="email" placeholder="Email" required>
+        <input id="reg-password" type="password" placeholder="Password" required>
+        <button type="submit">Register</button>
+        <p id="reg-msg" class="auth-msg"></p>
       </form>
     </div>
   </div>
