@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Class-EX</title>
 
-  <!-- כל ה-CSS כאן כדי שלא תהיה בעיית נתיב -->
   <style>
     :root {
       --gap: 12px;
@@ -24,7 +23,6 @@
       --border: #ddd;
     }
     
-    /* בסיס */
     * { box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
@@ -38,7 +36,6 @@
       padding: 24px;
     }
     
-    /* Sections כלליים */
     .section {
       background: var(--surface);
       border-radius: var(--card-radius);
@@ -51,7 +48,6 @@
       font-size: 20px;
     }
     
-    /* Controls למעלה */
     .controls {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -76,7 +72,6 @@
     .controls button:hover { background: var(--primary-hover); }
     .controls button:active { transform: translateY(1px); }
     
-    /* חיווי משתמש מחובר */
     #auth-indicator{
       padding: 6px 10px;
       border-radius: 8px;
@@ -86,14 +81,12 @@
       text-align: center;
     }
     
-    /* גרידים של סרטים/ווישליסט */
     #movies, #wish-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
       gap: var(--gap);
     }
     
-    /* כרטיס סרט */
     .movie-card {
       border: 1px solid #eee;
       border-radius: var(--card-radius);

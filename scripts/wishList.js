@@ -10,13 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!container) return;
 
-    // ספירת סרטים
     if (countSpan) {
       const count = movies.length;
       countSpan.textContent = count === 1 ? "1 movie" : `${count} movies`;
     }
 
-    // אם אין סרטים – מציגים empty state
     if (!movies || movies.length === 0) {
       container.innerHTML = "";
       if (emptyState) {
@@ -25,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // יש סרטים – מסתירים empty state
     if (emptyState) {
       emptyState.classList.add("hidden");
     }

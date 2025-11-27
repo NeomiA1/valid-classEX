@@ -15,7 +15,6 @@
     --border: #ddd;
   }
   
-  /* בסיס */
   * { box-sizing: border-box; }
   
   body {
@@ -31,7 +30,6 @@
     padding: 24px;
   }
   
-  /* Sections כלליים */
   .section {
     background: var(--surface);
     border-radius: var(--card-radius);
@@ -45,7 +43,6 @@
     font-size: 20px;
   }
   
-  /* Controls למעלה */
   .controls {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -73,7 +70,6 @@
   .controls button:hover { background: var(--primary-hover); }
   .controls button:active { transform: translateY(1px); }
   
-  /* חיווי משתמש מחובר */
   #auth-indicator{
     padding: 6px 10px;
     border-radius: 8px;
@@ -83,14 +79,12 @@
     text-align: center;
   }
   
-  /* גרידים של סרטים/ווישליסט */
   #movies, #wish-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     gap: var(--gap);
   }
   
-  /* כרטיס סרט */
   .movie-card {
     border: 1px solid #eee;
     border-radius: var(--card-radius);
@@ -119,7 +113,6 @@
   .movie-card h3 { margin: 0; font-size: 18px; }
   .movie-card p  { margin: 0; color: var(--muted); font-size: 14px; }
   
-  /* כפתורי wish */
   .btn-add-wish {
     margin-top: 8px;
     padding: 10px;
@@ -136,7 +129,6 @@
     color: #fff;
   }
   
-  /* כפתורים כלליים */
   .btn-primary,
   .btn-secondary,
   .btn-danger,
@@ -162,7 +154,6 @@
   }
   .btn-outline:hover{ background: var(--primary); color:#fff; }
   
-  /* טפסי Add Movie / Add Cast */
   .form-card {
     background: var(--surface);
     border-radius: var(--card-radius);
@@ -211,7 +202,6 @@
   
   .form-actions button{ flex:1; }
   
-  /* ולידציות / הודעות */
   .field-error {
     border-color: var(--danger) !important;
     background: #fff5f5;
@@ -229,19 +219,15 @@
     margin-top: 8px;
   }
   
-  /* ===== Auth Modal ===== */
-  
-  /* מחלקה כללית להסתרה */
+
   .hidden {
     display: none !important;
   }
   
-  /* כשגם auth-modal וגם hidden – זה מנצח את display:flex */
   .auth-modal.hidden {
     display: none !important;
   }
   
-  /* רקע שקוף */
   .auth-modal {
     position: fixed;
     inset: 0;
@@ -252,7 +238,6 @@
     z-index: 9999;
   }
   
-  /* קופסה */
   .auth-box {
     width: 100%;
     max-width: 420px;
@@ -263,7 +248,6 @@
     box-shadow: 0 6px 16px rgba(0,0,0,.2);
   }
   
-  /* X */
   .auth-close {
     position: absolute;
     top: 8px;
@@ -274,7 +258,6 @@
     cursor: pointer;
   }
   
-  /* טאבים Register/Login */
   .auth-tabs {
     display: flex;
     gap: 8px;
@@ -296,7 +279,6 @@
     border-color: var(--primary);
   }
   
-  /* שדות במודל */
   .auth-form input {
     width: 100%;
     padding: 12px;
@@ -325,7 +307,6 @@
     font-size: 14px;
   }
   
-  /* ===== Wish List Styling ===== */
 
 .wish-header {
     display: flex;
@@ -354,7 +335,6 @@
     white-space: nowrap;
   }
   
-  /* כרטיס שנמצא ב-Wish List */
   .wish-card {
     border: 1px solid #dde7ff;
     background: #f8fbff;
@@ -376,7 +356,6 @@
     color: var(--primary);
   }
   
-  /* מצב ריק */
   .empty-state {
     text-align: center;
     padding: 28px 16px;
@@ -391,7 +370,6 @@
     margin: 0 0 16px;
   }
   
-  /* רספונסיביות קטנה */
   @media (max-width: 600px){
     .page{ padding: 14px; }
   
