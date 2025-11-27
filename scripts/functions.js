@@ -1,4 +1,4 @@
-export const API_BASE = "https://localhost:44350";
+export const API_BASE = "https://localhost:44350/api";
 
 export function renderMovies(containerSelector, movies) {
   const container = document.querySelector(containerSelector);
@@ -21,68 +21,70 @@ export function renderMovies(containerSelector, movies) {
   container.innerHTML = html;
 }
 
-export function sendForm(event) {
-  event.preventDefault();
+export function saveUser(user) {
+  localStorage.setItem("loggedUser", JSON.stringify(user));
+}
 
-  const nameInput = document.querySelector("#name");
-  const emailInput = document.querySelector("#email");
-  const passwordInput = document.querySelector("#password");
-  const ageInput = document.querySelector("#age");
+export function getUser() {
+  const u = localStorage.getItem("loggedUser");
+  return u ? JSON.parse(u) : null;
+}
 
-  const name = nameInput.value.trim();
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  const age = Number(ageInput.value.trim());
+export function logout() {
+  localStorage.removeItem("loggedUser");
+}
 
-  if (!name) {
-    alert("Name is required.");
-    nameInput.focus();
-    return;
-  }
-  if (name.length < 2) {
-    alert("Name must be at least 2 characters.");
-    nameInput.focus();
-    return;
-  }
+export function isLoggedIn() {
+  return !!getUser();
+}
 
-  if (!email) {
-    alert("Email is required.");
-    emailInput.focus();
-    return;
-  }
-  if (!email.includes("@") || !email.includes(".")) {
-    alert("Please enter a valid email address.");
-    emailInput.focus();
-    return;
-  }
+export function setAuthUI() {
+  const btnAuth = document.querySelector("#btn-auth");
+  const indicator = document.querySelector("#auth-indicator");
+  if (!btnAuth || !indicator) return;
 
-  if (!password) {
-    alert("Password is required.");
-    passwordInput.focus();
-    return;
-  }
-  if (password.length < 6) {
-    alert("Password must be at least 6 characters.");
-    passwordInput.focus();
-    return;
-  }
+  const user = getUser();
 
-  if (!ageInput.value.trim()) {
-    alert("Age is required.");
-    ageInput.focus();
-    return;
+  if (user) {
+    btnAuth.textContent = "Logout";
+    indicator.style.display = "inline";
+    indicator.textContent = `Hi, ${user.userName || user.UserName}`;
+  } else {
+    btnAuth.textContent = "Login";
+    indicator.style.display = "none";
+    indicator.textContent = "";
   }
-  if (isNaN(age)) {
-    alert("Age must be a number.");
-    ageInput.focus();
-    return;
-  }
-  if (age < 18 || age > 100) {
-    alert("Age must be between 18 and 100.");
-    ageInput.focus();
-    return;
+}
+
+export async function registerUser(userName, email, password) {
+  const res = await fetch(`${API_BASE}/Users/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userName, email, password })
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(errText || "Register failed");
   }
 
-  alert("Registration successful!");
-  event.target.reset();
+  return true;
+}
+
+export async function loginUser(email, password) {
+  const res = await fetch(`${API_BASE}/Users/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    if (!errText && res.status === 401) {
+      throw new Error("Invalid email or password");
+    }
+    throw new Error(errText || "Login failed");
+  }
+
+  return await res.json();
 }

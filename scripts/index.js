@@ -1,29 +1,170 @@
-import { API_BASE, renderMovies, sendForm } from "./functions.js";
+import {
+  API_BASE,
+  renderMovies,
+  registerUser,
+  loginUser,
+  saveUser,
+  logout,
+  setAuthUI,
+  isLoggedIn
+} from "./functions.js";
 
-document.addEventListener("DOMContentLoaded", function () {
-  const containerSelector = "#movies";
-  const container = document.querySelector(containerSelector);
+document.addEventListener("DOMContentLoaded", () => {
+  // ======================
+  //     AUTH MODAL
+  // ======================
+  const modal     = document.querySelector("#auth-modal");
+  const btnAuth   = document.querySelector("#btn-auth");
+  const btnClose  = document.querySelector("#auth-close");
+  const tabReg    = document.querySelector("#tab-register");
+  const tabLog    = document.querySelector("#tab-login");
+  const regForm   = document.querySelector("#register-form");
+  const logForm   = document.querySelector("#login-form");
+  const regMsg    = document.querySelector("#reg-msg");
+  const logMsg    = document.querySelector("#login-msg");
 
-  const wishBtn = document.querySelector("#btn-show-wish");
-  const filterRatingBtn = document.querySelector("#btn-filter-rating");
-  const filterDurationBtn = document.querySelector("#btn-filter-duration");
-  const showAllBtn = document.querySelector("#btn-show-all");
-  const registerForm = document.querySelector("#RegisterForm");
-
-  if (registerForm) {
-    registerForm.addEventListener("submit", sendForm);
+  function openModal() {
+    if (modal) modal.classList.remove("hidden");
   }
 
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.add("hidden");
+    if (regMsg) regMsg.textContent = "";
+    if (logMsg) logMsg.textContent = "";
+  }
+
+  function showRegister() {
+    if (!tabReg || !tabLog || !regForm || !logForm) return;
+    tabReg.classList.add("active");
+    tabLog.classList.remove("active");
+    regForm.classList.remove("hidden");
+    logForm.classList.add("hidden");
+  }
+
+  function showLogin() {
+    if (!tabReg || !tabLog || !regForm || !logForm) return;
+    tabLog.classList.add("active");
+    tabReg.classList.remove("active");
+    logForm.classList.remove("hidden");
+    regForm.classList.add("hidden");
+  }
+
+  // כפתור Login / Logout
+  if (btnAuth) {
+    btnAuth.addEventListener("click", () => {
+      if (isLoggedIn()) {
+        logout();
+        setAuthUI();
+      } else {
+        showLogin();
+        openModal();
+      }
+    });
+  }
+
+  // סגירת המודל
+  if (btnClose) {
+    btnClose.addEventListener("click", closeModal);
+  }
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  // טאבים
+  if (tabReg) tabReg.addEventListener("click", showRegister);
+  if (tabLog) tabLog.addEventListener("click", showLogin);
+
+  // ----- REGISTER -----
+  if (regForm) {
+    regForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (regMsg) regMsg.textContent = "";
+      if (logMsg) logMsg.textContent = "";
+
+      const userNameInput  = document.querySelector("#reg-username");
+      const emailInput     = document.querySelector("#reg-email");
+      const passwordInput  = document.querySelector("#reg-password");
+
+      const userName = userNameInput.value.trim();
+      const email    = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!userName || !email || !password) {
+        if (regMsg) regMsg.textContent = "All fields are required.";
+        return;
+      }
+
+      try {
+        await registerUser(userName, email, password);
+
+        // נקה שדות
+        userNameInput.value = "";
+        emailInput.value    = "";
+        passwordInput.value = "";
+
+        // הודעה בלוגין + מעבר לטאב לוגין
+        if (logMsg) logMsg.textContent = "Registered! Now login with your details.";
+        showLogin();
+      } catch (err) {
+        if (regMsg) regMsg.textContent = err.message;
+      }
+    });
+  }
+
+  // ----- LOGIN -----
+  if (logForm) {
+    logForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (logMsg) logMsg.textContent = "";
+
+      const emailInput    = document.querySelector("#login-email");
+      const passwordInput = document.querySelector("#login-password");
+
+      const email    = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        if (logMsg) logMsg.textContent = "Email and password are required.";
+        return;
+      }
+
+      try {
+        const user = await loginUser(email, password);
+        saveUser(user);
+        setAuthUI();
+        closeModal();
+      } catch (err) {
+        if (logMsg) logMsg.textContent = err.message;
+      }
+    });
+  }
+
+  // חיווי ראשוני
+  setAuthUI();
+
+  // ======================
+  //     MOVIES LOGIC
+  // ======================
+  const containerSelector   = "#movies";
+  const container           = document.querySelector(containerSelector);
+  const wishBtn             = document.querySelector("#btn-show-wish");
+  const filterRatingBtn     = document.querySelector("#btn-filter-rating");
+  const filterDurationBtn   = document.querySelector("#btn-filter-duration");
+  const showAllBtn          = document.querySelector("#btn-show-all");
+
   if (wishBtn) {
-    wishBtn.addEventListener("click", function () {
+    wishBtn.addEventListener("click", () => {
       window.location.href = "wishList.html";
     });
   }
 
   if (filterRatingBtn) {
-    filterRatingBtn.addEventListener("click", function () {
+    filterRatingBtn.addEventListener("click", () => {
       const input = document.querySelector("#min-rating");
-      const raw = input.value.trim();
+      const raw   = input.value.trim();
       const value = Number(raw);
 
       if (!raw || isNaN(value)) {
@@ -31,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      fetch(`${API_BASE}/api/movie/rating/${value}`)
+      fetch(`${API_BASE}/Movie/rating/${value}`)
         .then(res => res.json())
         .then(movies => {
           window.__ALL_MOVIES__ = movies;
@@ -44,9 +185,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (filterDurationBtn) {
-    filterDurationBtn.addEventListener("click", function () {
+    filterDurationBtn.addEventListener("click", () => {
       const input = document.querySelector("#max-duration");
-      const raw = input.value.trim();
+      const raw   = input.value.trim();
       const value = Number(raw);
 
       if (!raw || isNaN(value)) {
@@ -54,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      fetch(`${API_BASE}/api/movie/duration?maxDuration=${value}`)
+      fetch(`${API_BASE}/Movie/duration?maxDuration=${value}`)
         .then(res => res.json())
         .then(movies => {
           window.__ALL_MOVIES__ = movies;
@@ -66,30 +207,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Show all movies
   if (showAllBtn) {
-    showAllBtn.addEventListener("click", function () {
+    showAllBtn.addEventListener("click", () => {
       loadAllMovies();
     });
   }
 
   if (container) {
-    container.addEventListener("click", function (event) {
+    container.addEventListener("click", (event) => {
       const btn = event.target.closest(".btn-add-wish");
       if (!btn) return;
 
-      const id = Number(btn.getAttribute("data-id"));
+      const id    = Number(btn.getAttribute("data-id"));
       const movie = (window.__ALL_MOVIES__ || []).find(m => m.id === id);
       if (!movie) return;
 
-      fetch(`${API_BASE}/api/movie/wishlist`, {
+      fetch(`${API_BASE}/Movie/wishlist`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(movie)
       })
         .then(res => {
           if (res.ok) {
-            btn.disabled = true;
+            btn.disabled   = true;
             btn.textContent = "Added ✓";
           } else {
             return res.text().then(msg => alert(msg || "Request failed"));
@@ -102,7 +242,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function loadAllMovies() {
-    fetch(`${API_BASE}/api/movie`)
+    fetch(`${API_BASE}/Movie`)
       .then(res => res.json())
       .then(movies => {
         window.__ALL_MOVIES__ = movies;
