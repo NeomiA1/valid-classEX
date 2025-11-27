@@ -10,9 +10,7 @@ import {
 } from "./functions.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ======================
-  //     AUTH MODAL
-  // ======================
+
   const modal = document.querySelector("#auth-modal");
   const btnAuth = document.querySelector("#btn-auth");
   const btnClose = document.querySelector("#auth-close");
@@ -54,23 +52,23 @@ document.addEventListener("DOMContentLoaded", () => {
     regForm.classList.add("hidden");
   }
 
-  // כפתור Login / Logout
+ 
   if (btnAuth) {
     btnAuth.addEventListener("click", () => {
       if (isLoggedIn()) {
-        // Logout: מוחק משתמש ורענון העמוד
+       
         logout();
         setAuthUI();
         window.location.reload();
       } else {
-        // Login: רק פותח מודל, לא אוטומטי בטעינה
+        
         showLogin();
         openModal();
       }
     });
   }
 
-  // סגירת המודל
+
   if (btnClose) {
     btnClose.addEventListener("click", closeModal);
   }
@@ -80,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // מעבר טאבים
   if (tabReg) {
     tabReg.addEventListener("click", showRegister);
   }
@@ -88,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tabLog.addEventListener("click", showLogin);
   }
 
-  // -------- Register --------
   if (regForm) {
     regForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -111,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         await registerUser(userName, email, password);
 
-        // אפשר להשאיר פשוט – רק הודעה בטאב של Register
         if (regMsg) regMsg.textContent = "Registered successfully. You can login now.";
 
       } catch (err) {
@@ -120,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // -------- Login --------
   if (logForm) {
     logForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -148,12 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // חיווי ראשוני לפי מצב החיבור (לא פותח מודל!)
   setAuthUI();
 
-  // ======================
-  //     MOVIES LOGIC
-  // ======================
   const containerSelector = "#movies";
   const container = document.querySelector(containerSelector);
 
@@ -222,7 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Show all movies
   function loadAllMovies() {
     fetch(`${API_BASE}/Movie`)
       .then(res => res.json())
@@ -247,13 +236,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Add to Wish List
   if (container) {
     container.addEventListener("click", (event) => {
       const btn = event.target.closest(".btn-add-wish");
       if (!btn) return;
 
-      // אם לא מחובר – נפתח מודל, אבל רק בלחיצה על הכפתור, לא בטעינה
       if (!isLoggedIn()) {
         alert("Please login first.");
         showLogin();
@@ -284,6 +271,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // טעינה ראשונית של הסרטים
   loadAllMovies();
 });
